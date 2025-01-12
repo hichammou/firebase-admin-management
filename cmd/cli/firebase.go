@@ -14,12 +14,20 @@ func (app application) createUser(email, password string, role *string) error {
 	}
 
 	user := (&auth.UserToCreate{}).Email(email).Password(password)
-	if *role != "" {
-		log.Println("role not empty")
-	}
-	_, err = authClient.CreateUser(context.Background(), user)
+
+	userRecord, err := authClient.CreateUser(context.Background(), user)
 	if err != nil {
 		return err
+	}
+
+	if *role != "" {
+		claims := map[string]interface{}{
+			"role": role,
+		}
+		err = authClient.SetCustomUserClaims(context.Background(), userRecord.UID, claims)
+		if err != nil {
+			log.Println("could not set user role")
+		}
 	}
 
 	return nil
