@@ -8,14 +8,9 @@ import (
 )
 
 func (app application) createUser(email, password string, role *string) error {
-	authClient, err := app.firebase.Auth(context.Background())
-	if err != nil {
-		return err
-	}
-
 	user := (&auth.UserToCreate{}).Email(email).Password(password)
 
-	userRecord, err := authClient.CreateUser(context.Background(), user)
+	userRecord, err := app.authClient.CreateUser(context.Background(), user)
 	if err != nil {
 		return err
 	}
@@ -24,7 +19,7 @@ func (app application) createUser(email, password string, role *string) error {
 		claims := map[string]interface{}{
 			"role": role,
 		}
-		err = authClient.SetCustomUserClaims(context.Background(), userRecord.UID, claims)
+		err = app.authClient.SetCustomUserClaims(context.Background(), userRecord.UID, claims)
 		if err != nil {
 			log.Println("could not set user role")
 		}

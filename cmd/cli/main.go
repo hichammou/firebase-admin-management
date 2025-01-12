@@ -8,11 +8,13 @@ import (
 	"os"
 
 	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/auth"
 	"google.golang.org/api/option"
 )
 
 type application struct {
-	firebase *firebase.App
+	firebase   *firebase.App
+	authClient *auth.Client
 }
 
 func main() {
@@ -23,8 +25,11 @@ func main() {
 		log.Fatalf("error initializing app: %v\n", err)
 	}
 
+	authClient, err := firebaseApp.Auth(context.Background())
+
 	app := application{
-		firebase: firebaseApp,
+		firebase:   firebaseApp,
+		authClient: authClient,
 	}
 
 	createUser := flag.Bool("create", false, "flag to create a user")
